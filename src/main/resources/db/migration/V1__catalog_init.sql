@@ -1,0 +1,7 @@
+CREATE TABLE catalog.brand (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    code VARCHAR(36) UNIQUE NOT NULL,
+    name VARCHAR(256) UNIQUE NOT NULL,
+    description TEXT,
+    logo_url TEXT UNIQUE
+)
