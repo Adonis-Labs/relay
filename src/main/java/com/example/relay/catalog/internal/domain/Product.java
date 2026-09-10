@@ -11,20 +11,18 @@ import java.util.UUID;
 /// Product is the Idea of a particular item. A grouping concept.
 /// SKU is specific sellable variant of it.
 @Entity
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Getter
-    private Long id;
-
-    @Column(name = "product_code", nullable = false, unique = true)
+@Table(schema = "catalog", name = "product")
+public class Product extends BaseEntity {
+    @Column(name = "product_code", nullable = false, unique = true, length = 36)
     @Getter
     private String productCode;
 
+    @Column(nullable = false, unique = true, length = 256)
     @Getter
     @Setter
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     @Getter
     @Setter
     private String description;
