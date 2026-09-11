@@ -77,4 +77,16 @@ public class Sku extends BaseEntity {
         // generate random alphanumeric SKU-Code
         this.skuCode = UUID.randomUUID().toString();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Sku other)) return false;
+        return getId() != null && getId().equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

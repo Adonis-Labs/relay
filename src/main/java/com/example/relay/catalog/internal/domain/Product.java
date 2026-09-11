@@ -27,8 +27,9 @@ public class Product extends BaseEntity {
     @Setter
     private String description;
 
-    @OneToMany(mappedBy = "product")
+    /// Orphaned SKU's will get removed. Ensure updates are in the same transaction or persistence context.
     @Getter
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Sku> skus = new ArrayList<>();
 
     // Product status?
@@ -39,5 +40,17 @@ public class Product extends BaseEntity {
 
     public void assignProductCode() {
         this.productCode = UUID.randomUUID().toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Product other)) return false;
+        return getId() != null && getId().equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
