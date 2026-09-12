@@ -64,6 +64,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
 	testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
 	testImplementation 'org.testcontainers:testcontainers-postgresql'
+	testImplementation 'org.postgresql:postgresql'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
@@ -77,4 +78,9 @@ dependencyManagement {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	// Colima's Docker socket lives at a host path Ryuk can't bind-mount directly;
+	// this tells Testcontainers to use the path valid inside the Colima VM instead.
+	// No-op on native Linux Docker (e.g. GitHub Actions runners), where the socket
+	// is already at this path.
+	environment 'TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE', '/var/run/docker.sock'
 }

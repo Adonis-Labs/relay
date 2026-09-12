@@ -39,3 +39,4 @@ out/
 
 application-local.properties
 flyway.conf
+/.claude/hooks/post-tool-call.py

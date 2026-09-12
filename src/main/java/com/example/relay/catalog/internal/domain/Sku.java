@@ -67,6 +67,7 @@ public class Sku extends BaseEntity {
     @ManyToOne
     @JoinColumn(nullable = false, name="product_id")
     @Getter
+    @Setter
     private Product product;
 
     public Sku() {
