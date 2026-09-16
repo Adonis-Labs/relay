@@ -1,9 +1,6 @@
 package com.example.relay.catalog.internal.domain;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 @MappedSuperclass
@@ -13,6 +10,9 @@ public class BaseEntity {
     @Getter
     private Long id;
 
+    @Version
+    @Getter
+    private int version;
     // Created at
     // updated at
     // created by

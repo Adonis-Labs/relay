@@ -1,6 +1,9 @@
 package com.example.relay.catalog.internal.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.Constraint;
+import jakarta.validation.ValidationException;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
@@ -8,6 +11,7 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import javax.naming.OperationNotSupportedException;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -58,27 +62,43 @@ public class Sku extends BaseEntity {
     @Setter
     private String size;
 
-    // Created at
-    // updated at
-    // created by
-    // last updated by
+    @Min(value = 0)
+    @Getter
+    @Column(nullable = false, check = @CheckConstraint(name = "stock_non_negative", constraint = "stock >= 0"))
+    private int stock;
 
-    // product foreign key owner
     @ManyToOne
     @JoinColumn(nullable = false, name="product_id")
     @Getter
     @Setter
     private Product product;
 
+    //region constructors
     public Sku() {
         setSkuCode();
     }
+    //endregion
 
+    //region setters
     private void setSkuCode() {
         // generate random alphanumeric SKU-Code
         this.skuCode = UUID.randomUUID().toString();
     }
 
+    public void incrementStock(int count) {
+        if(count<=0)
+            throw new ValidationException("Increment count must be greater than 0");
+        this.stock += count;
+    }
+
+    public void decrementStock(int count) {
+        if(this.getStock() - count < 0)
+            throw new ValidationException("Stock cannot be less than 0");
+        this.stock -= count;
+    }
+    //endregion
+
+    //region matchers
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -90,4 +110,5 @@ public class Sku extends BaseEntity {
     public int hashCode() {
         return getClass().hashCode();
     }
+    //endregion
 }
