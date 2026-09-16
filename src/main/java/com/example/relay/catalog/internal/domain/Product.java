@@ -1,6 +1,7 @@
 package com.example.relay.catalog.internal.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
@@ -18,6 +19,7 @@ public class Product extends BaseEntity {
     @Getter
     private String productCode;
 
+    @NotEmpty
     @Column(nullable = false, unique = true, length = 256)
     @Getter
     @Setter
