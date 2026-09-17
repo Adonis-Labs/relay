@@ -12,11 +12,4 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SkuService {
     private final SkuRepository skuRepository;
-
-    @Retryable(value = ObjectOptimisticLockingFailureException.class)
-    @Transactional
-    public void decrementStock(Long skuId, int count) {
-        Sku sku = skuRepository.findById(skuId).orElseThrow();
-        sku.decrementStock(count);
-    }
 }

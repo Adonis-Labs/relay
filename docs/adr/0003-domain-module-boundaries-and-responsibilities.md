@@ -102,7 +102,7 @@ Owns translation and resilience at the boundary with the outside world — for e
 ## Open Questions
 
 - **`stock` on `Sku`:** Was this a deliberate reversal of ADR-0002 (which explicitly deferred stock/inventory concerns out of catalog), or did it get added by accident while working on something else? Needs a decision before more catalog work is built on top of it.
-- **Category shape:** Should `Category` be a tree (a merchandising hierarchy like Department > Class > Subclass) or a flat list? And is a product's relationship to category one-to-many or many-to-many?
+- ~~**Category shape:**~~ **Resolved 2026-09-17.** `Category` is a tree (self-referencing `parent_id`, adjacency list), and `Product` → `Category` is many-to-one (a product sits at exactly one category). See `catalog.category` and `Product.category`.
 - **Pricing vs. catalog:** The current `Sku.price` is a single value. Real retail systems usually separate a catalog list price from a time/channel-scoped selling price (promotions, price lists). Worth deciding whether that separation matters for this project or is out of scope.
 - **External identifiers:** Where should identifiers like UPC/GTIN or a vendor's own item code live — directly on `Sku`, or in a separate identifier-mapping concept (which would naturally connect to the `integration` module's anti-corruption layer)?
 
@@ -110,5 +110,5 @@ Owns translation and resilience at the boundary with the outside world — for e
 
 1. [ ] Decide the fate of the `stock` field on `Sku` (move to `inventory`, or explicitly re-accept it in `catalog` with a written reason)
 2. [ ] Use this document's module table as the seed for the planned `relay-domain-spine.md` (end-to-end flows, module contracts, event catalogue, aggregate list)
-3. [ ] Resolve the Category shape question when the `catalog` module's vertical slice reaches `Category`
+3. [x] Resolve the Category shape question when the `catalog` module's vertical slice reaches `Category`
 4. [ ] Revisit the pricing/promotions boundary once a real use case (a promotion, a channel-specific price) comes up

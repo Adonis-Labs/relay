@@ -20,7 +20,14 @@ public class Sku extends AuditableEntity {
     private UUID publicId = UUID.randomUUID();
 
     /// Human/warehouse-readable retail code (e.g. PV-DOG-KIBBLE-15LB-BLK-001), distinct
-    /// from the opaque publicId. Not auto-derived yet — there should be a sku generator.
+    /// from the opaque publicId.
+    //
+    // TODO(human): implement a skuCode generator and wire it in. You have access to
+    // `product` (name/slug), `color`, and `size` on this entity — decide what the code's
+    // shape is (which fields feed it, in what order/format), how you guarantee uniqueness
+    // (a random suffix like Generators.randomAlphanumeric, or something else), and where
+    // it gets triggered (e.g. overriding setProduct like Product.setName does for slug,
+    // or a dedicated method) given color/size may not be set yet at that point.
     @NotEmpty
     @Column(name = "sku_code", nullable = false, unique = true, length = 64)
     @Getter
@@ -64,18 +71,4 @@ public class Sku extends AuditableEntity {
     @Getter
     @Setter
     private Product product;
-
-    //region matchers
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Sku other)) return false;
-        return getId() != null && getId().equals(other.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-    //endregion
 }

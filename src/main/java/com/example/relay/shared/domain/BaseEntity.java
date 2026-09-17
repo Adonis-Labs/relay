@@ -2,13 +2,13 @@ package com.example.relay.shared.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import org.springframework.data.annotation.CreatedBy;
+import org.hibernate.Hibernate;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
@@ -30,4 +30,17 @@ public abstract class BaseEntity {
     @Getter
     @LastModifiedDate
     private Instant updatedAt;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || Hibernate.getClass(this) != Hibernate.getClass(obj)) return false;
+        BaseEntity other = (BaseEntity) obj;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Hibernate.getClass(this).hashCode();
+    }
 }
