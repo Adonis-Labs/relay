@@ -1,9 +1,7 @@
 package com.example.relay.catalog.internal.domain;
 
+import com.example.relay.shared.domain.AuditableEntity;
 import jakarta.persistence.*;
-import jakarta.validation.Constraint;
-import jakarta.validation.ValidationException;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
@@ -11,28 +9,27 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import javax.naming.OperationNotSupportedException;
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
 @Table (schema = "catalog", name = "sku")
-public class Sku extends BaseEntity {
-    @Column(name = "code", nullable = false, unique = true, length = 36)
+public class Sku extends AuditableEntity {
+    @Column(name = "public_id", nullable = false, unique = true)
     @Getter
-    private String skuCode; // there should be a sku generator
+    private UUID publicId = UUID.randomUUID();
 
+    /// Human/warehouse-readable retail code (e.g. PV-DOG-KIBBLE-15LB-BLK-001), distinct
+    /// from the opaque publicId. Not auto-derived yet — there should be a sku generator.
+    @NotEmpty
+    @Column(name = "sku_code", nullable = false, unique = true, length = 64)
+    @Getter
+    @Setter
+    private String skuCode;
 
     /// Money should be a separate Value Object deferred for now
-    @Column(
-            nullable = false,
-            precision = 12,
-            scale = 2,
-            check = @CheckConstraint(
-                    name = "price_non_negative",
-                    constraint = "price >= 0"
-            )
-    )
+    @Column(nullable = false, precision = 12, scale = 2,
+            check = @CheckConstraint(name = "price_non_negative", constraint = "price >= 0"))
     @PositiveOrZero
     @Getter
     @Setter
@@ -62,41 +59,11 @@ public class Sku extends BaseEntity {
     @Setter
     private String size;
 
-    @Min(value = 0)
-    @Getter
-    @Column(nullable = false, check = @CheckConstraint(name = "stock_non_negative", constraint = "stock >= 0"))
-    private int stock;
-
     @ManyToOne
     @JoinColumn(nullable = false, name="product_id")
     @Getter
     @Setter
     private Product product;
-
-    //region constructors
-    public Sku() {
-        setSkuCode();
-    }
-    //endregion
-
-    //region setters
-    private void setSkuCode() {
-        // generate random alphanumeric SKU-Code
-        this.skuCode = UUID.randomUUID().toString();
-    }
-
-    public void incrementStock(int count) {
-        if(count<=0)
-            throw new ValidationException("Increment count must be greater than 0");
-        this.stock += count;
-    }
-
-    public void decrementStock(int count) {
-        if(this.getStock() - count < 0)
-            throw new ValidationException("Stock cannot be less than 0");
-        this.stock -= count;
-    }
-    //endregion
 
     //region matchers
     @Override

@@ -1,0 +1,2 @@
+ALTER TABLE sku
+    DROP COLUMN stock;

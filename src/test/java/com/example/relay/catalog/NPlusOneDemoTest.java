@@ -53,6 +53,7 @@ class NPlusOneDemoTest {
 				sku.setPrice(BigDecimal.TEN);
 				sku.setCurrency("USD");
 				sku.setStatus(SkuStatus.ACTIVE);
+				sku.setSkuCode("DEMO-SKU-" + p + "-" + s);
 				product.addSku(sku);
 			}
 			entityManager.persist(product);

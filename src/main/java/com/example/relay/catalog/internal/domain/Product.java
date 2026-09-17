@@ -1,5 +1,7 @@
 package com.example.relay.catalog.internal.domain;
 
+import com.example.relay.shared.domain.AuditableEntity;
+import com.example.relay.shared.helpers.Generators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -13,22 +15,26 @@ import java.util.UUID;
 /// Product is the Idea of a particular item. A grouping concept.
 /// SKU is specific sellable variant of it.
 @Entity
-@Table(schema = "catalog", name = "product")
-public class Product extends BaseEntity {
-    @Column(name = "product_code", nullable = false, unique = true, length = 36)
+@Table(name = "product", schema = "catalog")
+public class Product extends AuditableEntity {
+    @Column(name = "public_id", nullable = false, unique = true)
     @Getter
-    private String productCode;
+    private UUID publicId = UUID.randomUUID();
 
     @NotEmpty
-    @Column(nullable = false, unique = true, length = 256)
     @Getter
-    @Setter
+    @Column(nullable = false, unique = true, length = 256)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
     @Getter
     @Setter
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    @NotEmpty
+    @Getter
+    @Column(nullable = false, unique = true, length = 60)
+    private String slug;
 
     /// Orphaned SKU's will get removed. Ensure updates are in the same transaction or persistence context.
     /// BatchSize turns N per-product sku SELECTs into ceil(N / batchSize) batched IN-clause SELECTs.
@@ -39,17 +45,14 @@ public class Product extends BaseEntity {
 
     // Product status?
 
-    // TODO(human): implement addSku(Sku sku). `Sku.product` is the owning side of this
-    // bidirectional relationship (it holds the product_id FK column), so just adding to
-    // the `skus` list here is not enough — the sku's `product` reference must also be set,
-    // or the FK will be written as null and the not-null constraint on product_id will fail.
-
-    public Product() {
-        assignProductCode();
+    public void setName(String name) {
+        if (this.slug == null || this.slug.isEmpty())
+            generateSlug(name);
+        this.name = name;
     }
 
-    public void assignProductCode() {
-        this.productCode = UUID.randomUUID().toString();
+    private void generateSlug(String name) {
+        this.slug = slugify(name) + "-" + Generators.randomAlphanumeric(8);
     }
 
     public void addSku(Sku sku) {
@@ -68,4 +71,19 @@ public class Product extends BaseEntity {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    //region Helpers
+    private String slugify(String name) {
+        String transformed = name
+                .toLowerCase()
+                .trim()
+                .replaceAll("[^a-z0-9\\s-]", "") // strip punctuation
+                .replaceAll("\\s+", "-")          // whitespace -> hyphen
+                .replaceAll("-+", "-")            // collapse repeated hyphens
+                .replaceAll("^-|-$", "");         // trim leading/trailing hyphen
+        if (transformed.isEmpty())
+            transformed = "product";
+        return transformed.substring(0, Math.min(transformed.length(), 50));
+    }
+    //endregion
 }
