@@ -12,3 +12,5 @@ CREATE TABLE catalog.category (
     created_by VARCHAR(255) NOT NULL,
     last_modified_by VARCHAR(255) NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS idx_category_parent ON catalog.category (parent_id);

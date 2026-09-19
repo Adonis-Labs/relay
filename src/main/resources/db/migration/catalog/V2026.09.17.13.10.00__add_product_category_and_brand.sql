@@ -5,3 +5,16 @@ ALTER TABLE catalog.product
 
 ALTER TABLE catalog.product
     ADD COLUMN brand_id BIGINT NOT NULL REFERENCES catalog.brand (id);
+
+CREATE INDEX IF NOT EXISTS
+    idx_product_category_brand
+    ON
+    catalog.product (
+        category_id,
+        brand_id
+    );
+
+CREATE INDEX IF NOT EXISTS
+    idx_product_brand
+    ON
+    catalog.product (brand_id);
