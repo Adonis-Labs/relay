@@ -3,10 +3,13 @@ package com.example.relay.catalog.internal.domain;
 import com.example.relay.shared.domain.AuditableEntity;
 import com.example.relay.shared.helpers.Generators;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +18,10 @@ import java.util.UUID;
 /// Product is the Idea of a particular item. A grouping concept.
 /// SKU is specific sellable variant of it.
 @Entity
-@Table(name = "product", schema = "catalog")
+@Table(name = "product", schema = "catalog", indexes = {
+        @Index(name = "idx_product_category_brand", columnList = "category_id, brand_id"),
+        @Index(name = "idx_product_brand", columnList = "brand_id")
+})
 public class Product extends AuditableEntity {
     @Column(name = "public_id", nullable = false, unique = true)
     @Getter
@@ -23,6 +29,8 @@ public class Product extends AuditableEntity {
 
     @NotEmpty
     @Getter
+    @NotBlank
+    @Size(max = 255, min = 1)
     @Column(nullable = false, unique = true, length = 256)
     private String name;
 
@@ -33,6 +41,7 @@ public class Product extends AuditableEntity {
 
     @NotEmpty
     @Getter
+    @Length(max = 60)
     @Column(nullable = false, unique = true, length = 60)
     private String slug;
 

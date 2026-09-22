@@ -36,8 +36,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.mapstruct:mapstruct:1.6.3'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
 	// Persistence
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -83,4 +86,11 @@ tasks.named('test') {
 	// No-op on native Linux Docker (e.g. GitHub Actions runners), where the socket
 	// is already at this path.
 	environment 'TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE', '/var/run/docker.sock'
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += [
+			'-Amapstruct.defaultComponentModel=spring',
+			'-Amapstruct.unmappedTargetPolicy=ERROR'
+	]
 }

@@ -1,0 +1,1 @@
+- [Fixing N+1 lesson todos](jpa-n1-fix-lesson-todos.md) — open checklist for Notion page "Fixing N+1 | @EntityGraph, JOIN FETCH & Batch Fetching" (M8, Lecture #44)
