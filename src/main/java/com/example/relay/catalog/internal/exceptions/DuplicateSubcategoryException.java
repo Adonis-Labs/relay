@@ -1,4 +1,6 @@
-package com.example.relay.catalog.internal.domain;
+package com.example.relay.catalog.internal.exceptions;
+
+import com.example.relay.catalog.internal.domain.Category;
 
 public class DuplicateSubcategoryException extends IllegalArgumentException {
     public DuplicateSubcategoryException(Category subcategory) {

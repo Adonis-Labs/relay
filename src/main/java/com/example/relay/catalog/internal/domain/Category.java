@@ -1,5 +1,7 @@
 package com.example.relay.catalog.internal.domain;
 
+import com.example.relay.catalog.internal.exceptions.CategoryCycleException;
+import com.example.relay.catalog.internal.exceptions.DuplicateSubcategoryException;
 import com.example.relay.shared.domain.AuditableEntity;
 import com.example.relay.shared.helpers.Generators;
 import jakarta.persistence.*;
@@ -49,6 +51,15 @@ public class Category extends AuditableEntity {
     public void addSubcategory(Category subcategory) {
         if (this.subcategories.contains(subcategory))
             throw new DuplicateSubcategoryException(subcategory);
+
+        for (Category ancestor = this; ancestor != null; ancestor = ancestor.getParentCategory()) {
+            if (ancestor.equals(subcategory))
+                throw new CategoryCycleException(
+                        "Cannot add '%s' as a subcategory of '%s' - '%s' is already an ancestor of '%s'"
+                                .formatted(subcategory.getName(), this.getName(), subcategory.getName(), this.getName())
+                );
+        }
+
         this.subcategories.add(subcategory);
         subcategory.setParentCategory(this);
     }

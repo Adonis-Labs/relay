@@ -23,9 +23,9 @@ public class ProductController {
         return null;
     }
 
-    @PostMapping("/")
-    public ResponseEntity<UUID> post(@Valid @RequestBody CreateProductRequest productRequest) {
-        UUID id = productService.createProduct(productRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(id);
-    }
+//    @PostMapping("/")
+//    public ResponseEntity<UUID> post(@Valid @RequestBody CreateProductRequest productRequest) {
+//        UUID id = productService.createProduct(productRequest);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(id);
+//    }
 }

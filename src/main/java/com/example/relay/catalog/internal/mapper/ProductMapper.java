@@ -10,5 +10,5 @@ import org.mapstruct.*;
 )
 public interface ProductMapper {
 
-    Product toEntity(CreateProductRequest createProductRequest);
+//    Product toEntity(CreateProductRequest createProductRequest);
 }

@@ -15,9 +15,9 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
-    public UUID createProduct(CreateProductRequest request) {
-        Product newProduct = productMapper.toEntity(request);
-        productRepository.save(newProduct);
-        return newProduct.getPublicId();
-    }
+//    public UUID createProduct(CreateProductRequest request) {
+////        Product newProduct = productMapper.toEntity(request);
+////        productRepository.save(newProduct);
+////        return newProduct.getPublicId();
+//    }
 }
