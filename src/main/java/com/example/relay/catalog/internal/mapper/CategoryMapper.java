@@ -3,6 +3,7 @@ package com.example.relay.catalog.internal.mapper;
 import com.example.relay.catalog.internal.domain.Category;
 import com.example.relay.catalog.internal.dto.CategoryResponse;
 import com.example.relay.catalog.internal.dto.CategoryTreeResponse;
+import com.example.relay.catalog.internal.dto.CreateCategoryRequest;
 import com.example.relay.catalog.internal.dto.UpdateCategoryRequest;
 import org.mapstruct.*;
 
@@ -18,6 +19,11 @@ public interface CategoryMapper {
     public CategoryResponse toCategoryResponse(Category category);
 
     public List<CategoryResponse> toCategoryResponseList(List<Category> categories);
+
+    @Mapping(target = "publicId", ignore = true)
+    @Mapping(target = "parentCategory", ignore = true)
+    @Mapping(target = "subcategories", ignore = true)
+    public Category toEntity(CreateCategoryRequest request);
 
     @Mapping(target = "publicId", ignore = true)
     @Mapping(target = "parentCategory", ignore = true)

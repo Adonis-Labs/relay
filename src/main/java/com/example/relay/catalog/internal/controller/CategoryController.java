@@ -4,13 +4,16 @@ import com.example.relay.catalog.internal.dto.AddSubcategoryRequest;
 import com.example.relay.catalog.internal.dto.CategoryResponse;
 import com.example.relay.catalog.internal.dto.CategoryTreeResponse;
 import com.example.relay.catalog.internal.dto.ChangeCategoryParentRequest;
+import com.example.relay.catalog.internal.dto.CreateCategoryRequest;
 import com.example.relay.catalog.internal.dto.UpdateCategoryRequest;
 import com.example.relay.catalog.internal.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +22,17 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
+
+    @PostMapping
+    public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CreateCategoryRequest req) {
+        CategoryResponse category = categoryService.createCategory(req);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(category.id())
+                .toUri();
+        return ResponseEntity.created(location).body(category);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getCategory(@PathVariable UUID id) {

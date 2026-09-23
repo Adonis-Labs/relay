@@ -3,6 +3,7 @@ package com.example.relay.catalog.internal.service;
 import com.example.relay.catalog.internal.domain.Category;
 import com.example.relay.catalog.internal.dto.CategoryResponse;
 import com.example.relay.catalog.internal.dto.CategoryTreeResponse;
+import com.example.relay.catalog.internal.dto.CreateCategoryRequest;
 import com.example.relay.catalog.internal.dto.UpdateCategoryRequest;
 import com.example.relay.catalog.internal.exceptions.CategoryNotFoundException;
 import com.example.relay.catalog.internal.mapper.CategoryMapper;
@@ -19,6 +20,22 @@ import java.util.UUID;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+
+    @Transactional
+    public CategoryResponse createCategory(CreateCategoryRequest request) {
+        Category newCategory = categoryMapper.toEntity(request);
+
+        if (request.parentId() != null) {
+            Category parent = categoryRepository.findByPublicId(request.parentId());
+            if (parent == null) {
+                throw new CategoryNotFoundException("No category found with id '" + request.parentId() + "'");
+            }
+            parent.addSubcategory(newCategory);
+        }
+
+        Category createdCategory = categoryRepository.save(newCategory);
+        return categoryMapper.toCategoryResponse(createdCategory);
+    }
 
     public CategoryResponse findCategoryByPublicId(UUID publicId) {
         Category category = categoryRepository.findByPublicId(publicId);
