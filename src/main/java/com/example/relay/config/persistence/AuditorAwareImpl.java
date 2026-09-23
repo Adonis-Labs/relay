@@ -1,4 +1,4 @@
-package com.example.relay.shared.domain;
+package com.example.relay.config.persistence;
 
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;

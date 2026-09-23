@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/catalog/brand")
+@RequestMapping(path = "/brands", version = "v1+")
 @AllArgsConstructor
 public class BrandController {
     private final BrandService brandService;

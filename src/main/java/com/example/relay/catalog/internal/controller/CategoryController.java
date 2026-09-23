@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/catalog/category")
+@RequestMapping(path = "/categories", version = "v1+")
 @AllArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;

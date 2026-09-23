@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "/catalog/product")
+@RequestMapping(path = "/products", version = "v1+")
 public class ProductController {
     private final ProductService productService;
 
@@ -19,11 +19,11 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> get(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> get(@PathVariable(name = "id") UUID id) {
         return null;
     }
 
-//    @PostMapping("/")
+//    @PostMapping
 //    public ResponseEntity<UUID> post(@Valid @RequestBody CreateProductRequest productRequest) {
 //        UUID id = productService.createProduct(productRequest);
 //        return ResponseEntity.status(HttpStatus.CREATED).body(id);
