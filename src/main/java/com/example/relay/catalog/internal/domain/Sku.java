@@ -13,7 +13,11 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table (schema = "catalog", name = "sku")
+@Table(
+    schema = "catalog",
+    name = "sku",
+    indexes = {@Index(name="idx_product_id", columnList = "product_id")}
+)
 public class Sku extends AuditableEntity {
     @Column(name = "public_id", nullable = false, unique = true)
     @Getter

@@ -26,19 +26,11 @@ public class ProductService {
     private final ProductMapper productMapper;
 
     public ProductResponse createProduct(CreateProductRequest request) {
-        Category category = categoryRepository.findByPublicId(request.categoryId());
-        if (category == null) {
-            throw new EntityNotFoundException("No category found with id '" + request.categoryId() + "'");
-        }
-
-        Brand brand = brandRepository.findByPublicId(request.brandId());
-        if (brand == null) {
-            throw new EntityNotFoundException("No brand found with id '" + request.brandId() + "'");
-        }
+        ProductRefs refs = resolveProductRefs(request.categoryId(), request.brandId());
 
         Product newProduct = productMapper.toEntity(request);
-        newProduct.setCategory(category);
-        newProduct.setBrand(brand);
+        newProduct.setCategory(refs.category());
+        newProduct.setBrand(refs.brand());
 
         Product createdProduct = productRepository.save(newProduct);
         return productMapper.toProductResponse(createdProduct);
@@ -63,21 +55,31 @@ public class ProductService {
             throw new EntityNotFoundException("No product found with id '" + publicId + "'");
         }
 
-        Category category = categoryRepository.findByPublicId(request.categoryId());
-        if (category == null) {
-            throw new EntityNotFoundException("No category found with id '" + request.categoryId() + "'");
-        }
-
-        Brand brand = brandRepository.findByPublicId(request.brandId());
-        if (brand == null) {
-            throw new EntityNotFoundException("No brand found with id '" + request.brandId() + "'");
-        }
+        ProductRefs refs = resolveProductRefs(request.categoryId(), request.brandId());
 
         productMapper.updateEntityFromRequest(request, product);
-        product.setCategory(category);
-        product.setBrand(brand);
+        product.setCategory(refs.category());
+        product.setBrand(refs.brand());
 
         Product updatedProduct = productRepository.save(product);
         return productMapper.toProductResponse(updatedProduct);
     }
+
+    //region helpers
+    private record ProductRefs(Category category, Brand brand) {}
+
+    private ProductRefs resolveProductRefs(UUID categoryId, UUID brandId) {
+        Category category = categoryRepository.findByPublicId(categoryId);
+        if (category == null) {
+            throw new EntityNotFoundException("No category found with id '" + categoryId + "'");
+        }
+
+        Brand brand = brandRepository.findByPublicId(brandId);
+        if (brand == null) {
+            throw new EntityNotFoundException("No brand found with id '" + brandId + "'");
+        }
+
+        return new ProductRefs(category, brand);
+    }
+    //endregion
 }
