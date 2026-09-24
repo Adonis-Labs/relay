@@ -14,9 +14,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
 import com.example.relay.TestcontainersConfiguration;
+import com.example.relay.catalog.internal.domain.Brand;
+import com.example.relay.catalog.internal.domain.Category;
 import com.example.relay.catalog.internal.domain.Product;
 import com.example.relay.catalog.internal.domain.Sku;
 import com.example.relay.catalog.internal.domain.SkuStatus;
+import com.example.relay.catalog.internal.repository.ProductRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,12 +45,27 @@ class NPlusOneDemoTest {
 	@Autowired
 	EntityManagerFactory entityManagerFactory;
 
+	@Autowired
+	ProductRepository productRepository;
+
 	@Test
 	@Transactional
 	void batchSizeTurnsPerProductSelectsIntoBatchedInClauseSelects() {
+		// category/brand are NOT NULL @ManyToOne columns on Product; reusing the same
+		// row for every product keeps this test's focus on sku batching (see below).
+		Category category = new Category();
+		category.setName("N+1 Demo Category");
+		entityManager.persist(category);
+
+		Brand brand = new Brand();
+		brand.setName("N+1 Demo Brand");
+		entityManager.persist(brand);
+
 		for (int p = 0; p < PRODUCT_COUNT; p++) {
 			Product product = new Product();
 			product.setName("N+1 Demo Product " + p);
+			product.setCategory(category);
+			product.setBrand(brand);
 			for (int s = 0; s < SKUS_PER_PRODUCT; s++) {
 				Sku sku = new Sku();
 				sku.setPrice(BigDecimal.TEN);
@@ -73,7 +91,48 @@ class NPlusOneDemoTest {
 			product.getSkus().size();
 		}
 
+		// +2: category/brand default to EAGER with no join-fetch, so each is resolved with
+		// its own SELECT the first time it's encountered - but only once, since every
+		// product shares the same category/brand row and Hibernate finds it already in the
+		// persistence context (by id) for the remaining products.
 		int expectedBatches = (int) Math.ceil((double) products.size() / BATCH_SIZE);
-		assertThat(stats.getPrepareStatementCount()).isEqualTo(1 + expectedBatches);
+		assertThat(stats.getPrepareStatementCount()).isEqualTo(1 + 2 + expectedBatches);
+	}
+
+	/**
+	 * Products getAll (NX-92) used to eager-load Product.category/Product.brand with a
+	 * separate SELECT per product per association. findAllProjectedBy() instead projects
+	 * only the columns ProductResponse needs - including category/brand publicId via a
+	 * join - so Category/Brand are never loaded as entities and there's nothing left to
+	 * N+1 on, regardless of how many products exist.
+	 */
+	@Test
+	@Transactional
+	void projectionQueryStaysAtOneStatementRegardlessOfProductCount() {
+		Category category = new Category();
+		category.setName("N+1 Demo Category");
+		entityManager.persist(category);
+
+		Brand brand = new Brand();
+		brand.setName("N+1 Demo Brand");
+		entityManager.persist(brand);
+
+		for (int p = 0; p < PRODUCT_COUNT; p++) {
+			Product product = new Product();
+			product.setName("N+1 Demo Projected Product " + p);
+			product.setCategory(category);
+			product.setBrand(brand);
+			entityManager.persist(product);
+		}
+		entityManager.flush();
+		entityManager.clear();
+
+		Statistics stats = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+		stats.clear();
+
+		var products = productRepository.findAllProjectedBy();
+
+		assertThat(products).hasSize(PRODUCT_COUNT);
+		assertThat(stats.getPrepareStatementCount()).isEqualTo(1);
 	}
 }

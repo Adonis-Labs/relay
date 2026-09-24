@@ -2,6 +2,7 @@ package com.example.relay.catalog.internal.mapper;
 
 import com.example.relay.catalog.internal.domain.Product;
 import com.example.relay.catalog.internal.dto.CreateProductRequest;
+import com.example.relay.catalog.internal.dto.ProductListView;
 import com.example.relay.catalog.internal.dto.ProductResponse;
 import com.example.relay.catalog.internal.dto.UpdateProductRequest;
 import org.mapstruct.*;
@@ -31,4 +32,6 @@ public interface ProductMapper {
     ProductResponse toProductResponse(Product product);
 
     List<ProductResponse> toProductResponseList(List<Product> products);
+
+    List<ProductResponse> toProductResponseListFromView(List<ProductListView> views);
 }
