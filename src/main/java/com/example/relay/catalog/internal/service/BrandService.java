@@ -4,7 +4,7 @@ import com.example.relay.catalog.internal.domain.Brand;
 import com.example.relay.catalog.internal.dto.BrandResponse;
 import com.example.relay.catalog.internal.dto.CreateBrandRequest;
 import com.example.relay.catalog.internal.dto.UpdateBrandRequest;
-import com.example.relay.catalog.internal.exceptions.BrandNotFoundException;
+import com.example.relay.catalog.internal.exceptions.EntityNotFoundException;
 import com.example.relay.catalog.internal.mapper.BrandMapper;
 import com.example.relay.catalog.internal.repository.BrandRepository;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class BrandService {
     public BrandResponse updateBrand(UUID publicId, UpdateBrandRequest request) {
         Brand brand = brandRepository.findByPublicId(publicId);
         if (brand == null) {
-            throw new BrandNotFoundException("No brand found with id '" + publicId + "'");
+            throw new EntityNotFoundException("No brand found with id '" + publicId + "'");
         }
 
         brandMapper.updateEntityFromRequest(request, brand);

@@ -5,7 +5,7 @@ import com.example.relay.catalog.internal.dto.CategoryResponse;
 import com.example.relay.catalog.internal.dto.CategoryTreeResponse;
 import com.example.relay.catalog.internal.dto.CreateCategoryRequest;
 import com.example.relay.catalog.internal.dto.UpdateCategoryRequest;
-import com.example.relay.catalog.internal.exceptions.CategoryNotFoundException;
+import com.example.relay.catalog.internal.exceptions.EntityNotFoundException;
 import com.example.relay.catalog.internal.mapper.CategoryMapper;
 import com.example.relay.catalog.internal.repository.CategoryRepository;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class CategoryService {
         if (request.parentId() != null) {
             Category parent = categoryRepository.findByPublicId(request.parentId());
             if (parent == null) {
-                throw new CategoryNotFoundException("No category found with id '" + request.parentId() + "'");
+                throw new EntityNotFoundException("No category found with id '" + request.parentId() + "'");
             }
             parent.addSubcategory(newCategory);
         }
@@ -40,7 +40,7 @@ public class CategoryService {
     public CategoryResponse findCategoryByPublicId(UUID publicId) {
         Category category = categoryRepository.findByPublicId(publicId);
         if (category == null) {
-            throw new CategoryNotFoundException("No category found with id '" + publicId + "'");
+            throw new EntityNotFoundException("No category found with id '" + publicId + "'");
         }
         return categoryMapper.toCategoryResponse(category);
     }
@@ -56,15 +56,15 @@ public class CategoryService {
     public CategoryTreeResponse findCategoryTreeByPublicId(UUID publicId) {
         Category category = categoryRepository.findByPublicId(publicId);
         if (category == null) {
-            throw new CategoryNotFoundException("No category found with id '" + publicId + "'");
+            throw new EntityNotFoundException("No category found with id '" + publicId + "'");
         }
-        return categoryMapper.toTreeResponse(category);
+return categoryMapper.toTreeResponse(category);
     }
 
     public CategoryResponse updateCategory(UUID publicId, UpdateCategoryRequest request) {
         Category category = categoryRepository.findByPublicId(publicId);
         if (category == null) {
-            throw new CategoryNotFoundException("No category found with id '" + publicId + "'");
+            throw new EntityNotFoundException("No category found with id '" + publicId + "'");
         }
 
         categoryMapper.updateEntityFromRequest(request, category);
@@ -76,12 +76,12 @@ public class CategoryService {
     public CategoryResponse addSubcategory(UUID parentPublicId, UUID subcategoryPublicId) {
         Category parent = categoryRepository.findByPublicId(parentPublicId);
         if (parent == null) {
-            throw new CategoryNotFoundException("No category found with id '" + parentPublicId + "'");
+            throw new EntityNotFoundException("No category found with id '" + parentPublicId + "'");
         }
 
         Category subcategory = categoryRepository.findByPublicId(subcategoryPublicId);
         if (subcategory == null) {
-            throw new CategoryNotFoundException("No category found with id '" + subcategoryPublicId + "'");
+            throw new EntityNotFoundException("No category found with id '" + subcategoryPublicId + "'");
         }
 
         parent.addSubcategory(subcategory);
@@ -93,7 +93,7 @@ public class CategoryService {
     public CategoryResponse changeParent(UUID publicId, UUID newParentPublicId) {
         Category category = categoryRepository.findByPublicId(publicId);
         if (category == null) {
-            throw new CategoryNotFoundException("No category found with id '" + publicId + "'");
+            throw new EntityNotFoundException("No category found with id '" + publicId + "'");
         }
 
         if (newParentPublicId == null) {
@@ -101,7 +101,7 @@ public class CategoryService {
         } else {
             Category newParent = categoryRepository.findByPublicId(newParentPublicId);
             if (newParent == null) {
-                throw new CategoryNotFoundException("No category found with id '" + newParentPublicId + "'");
+                throw new EntityNotFoundException("No category found with id '" + newParentPublicId + "'");
             }
             newParent.addSubcategory(category);
         }

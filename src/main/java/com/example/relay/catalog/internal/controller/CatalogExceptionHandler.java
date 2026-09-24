@@ -1,9 +1,8 @@
 package com.example.relay.catalog.internal.controller;
 
 import com.example.relay.catalog.internal.exceptions.DuplicateSubcategoryException;
-import com.example.relay.catalog.internal.exceptions.BrandNotFoundException;
 import com.example.relay.catalog.internal.exceptions.CategoryCycleException;
-import com.example.relay.catalog.internal.exceptions.CategoryNotFoundException;
+import com.example.relay.catalog.internal.exceptions.EntityNotFoundException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,15 +15,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice(basePackageClasses = BrandController.class)
 public class CatalogExceptionHandler {
 
-    @ExceptionHandler(BrandNotFoundException.class)
+    @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ProblemDetail handleBrandNotFound(@NonNull BrandNotFoundException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
-    }
-
-    @ExceptionHandler(CategoryNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ProblemDetail handleCategoryNotFound(@NonNull CategoryNotFoundException e) {
+    public ProblemDetail handleEntityNotFound(@NonNull EntityNotFoundException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
@@ -52,6 +45,9 @@ public class CatalogExceptionHandler {
                 case "brand_slug_key" -> "A brand with this slug already exists";
                 case "brand_logo_url_key" -> "This logo is already in use by another brand";
                 case "category_name_key" -> "A category with this name already exists";
+                case "product_name_key" -> "A product with this name already exists";
+                case "product_slug_key" -> "A product with this slug already exists";
+                case "sku_sku_code_key" -> "A SKU with this code already exists";
                 default -> message;
             };
         }
