@@ -4,6 +4,7 @@ import com.example.relay.catalog.internal.domain.Brand;
 import com.example.relay.catalog.internal.domain.Category;
 import com.example.relay.catalog.internal.domain.Product;
 import com.example.relay.catalog.internal.dto.CreateProductRequest;
+import com.example.relay.catalog.internal.dto.ProductListView;
 import com.example.relay.catalog.internal.dto.ProductResponse;
 import com.example.relay.catalog.internal.dto.UpdateProductRequest;
 import com.example.relay.catalog.internal.exceptions.EntityNotFoundException;
@@ -45,8 +46,8 @@ public class ProductService {
     }
 
     public List<ProductResponse> findAllProducts() {
-        List<Product> products = productRepository.findAll();
-        return productMapper.toProductResponseList(products);
+        List<ProductListView> products = productRepository.findAllProjectedBy();
+        return productMapper.toProductResponseListFromView(products);
     }
 
     public ProductResponse updateProduct(UUID publicId, UpdateProductRequest request) {
